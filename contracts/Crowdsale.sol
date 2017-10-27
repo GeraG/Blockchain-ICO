@@ -67,9 +67,8 @@ contract Crowdsale {
     }
 
     q.enqueue(msg.sender);
-    uint8 place = q.checkPlace();
-    while (place > 1) {
-      place = checkPlace();
+    while (q.checkPlace() > 1) {  // wait until first in line
+      continue;
     }
     assert(q.checkPlace > 0);  // should NEVER happen
 
@@ -80,6 +79,9 @@ contract Crowdsale {
       return false;
     }
 
+    while (q.qsize() < 1) {  // wait until at least 2 nodes in the queue
+      continue;
+    }
     q.dequeue();
     bool success = token.transfer(msg.sender, tokensPurchased);
     PurchaseCompleted(msg.sender, success);
