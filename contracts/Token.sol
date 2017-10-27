@@ -1,7 +1,7 @@
 pragma solidity ^0.4.15;
 
 import './interfaces/ERC20Interface.sol';
-import './interfaces/SafeMath.sol' as math;
+import './utils/SafeMath.sol' as math;
 
 /**
  * @title Token
