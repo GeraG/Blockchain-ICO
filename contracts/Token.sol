@@ -78,16 +78,16 @@ contract Token is ERC20Interface {
 
         Approve[] approvalArray = approvals[_from];
 
-        for (uint i = 0; i < approvalArray.length; i++) {
-            if (approvalArray[i].spender == msg.sender) {
-                if (approvalArray[i].amountApproved < _value) {
+        for (uint s = 0; s < approvalArray.length; s++) {
+            if (approvalArray[s].spender == msg.sender) {
+                if (approvalArray[s].amountApproved < _value) {
                     return false;
                 }
 
                 // Transfer
-                approvalArray[i].amountApproved = math.sub(approvalArray[i].amountApproved, _value);
-                balances[_from].balance = math.sub(balances[_from].balance, _value);
+                approvalArray[s].amountApproved = math.sub(approvalArray[s].amountApproved, _value);
                 balances[_from].totalApproved = math.sub(balances[_from].totalApproved, _value);
+                balances[_from].balance = math.sub(balances[_from].balance, _value);
                 balances[_to].balance = math.add(balances[_to].balance, _value);
 
                 Transfer(_from, _to, _value);
@@ -114,9 +114,9 @@ contract Token is ERC20Interface {
 
         Approve[] approvalArray = approvals[msg.sender];
         bool done = false;
-        for (uint i = 0; i < approvalArray.length; i++) {
-            if (approvalArray[i].spender == _spender) {
-                approvalArray[i].amountApproved = math.add(approvalArray[i].amountApproved, _value);
+        for (uint s = 0; s < approvalArray.length; s++) {
+            if (approvalArray[s].spender == _spender) {
+                approvalArray[s].amountApproved = math.add(approvalArray[s].amountApproved, _value);
                 done = true;
                 break;
             }
@@ -138,9 +138,9 @@ contract Token is ERC20Interface {
         uint256 ret = 0;
 
         Approve[] approvalArray = approvals[_owner];
-        for (uint i = 0; i < approvalArray.length; i++) {
-            if (approvalArray[i].spender == _spender) {
-                ret = approvalArray[i].amountApproved;
+        for (uint s = 0; s < approvalArray.length; s++) {
+            if (approvalArray[s].spender == _spender) {
+                ret = approvalArray[s].amountApproved;
                 break;
             }
         }
@@ -148,18 +148,34 @@ contract Token is ERC20Interface {
         return ret;
     }
 
+    function burn(uint256 _value) returns (bool success) {
+        // Can only burn the remaining tokens not approved to anyone
+        if (math.sub(balances[msg.sender].balance, balances[msg.sender].totalApproved) < _value) {
+            return false;
+        }
+
+        balances[msg.sender].balance = math.sub(balances[msg.sender].balance, _value);
+        totalSupply = math.sub(totalSupply, _value);
+
+        Burn(msg.sender, _value);
+        return true;
+    }
+
     function refund(address _from, uint256 _value) OwnerOnly() returns (bool success) {
-        if (math.sub(balances[_from].balance, balances[_from].amountApproved) < _value) {
+        // Can only take out the remaining tokens not approved to anyone
+        if (math.sub(balances[_from].balance, balances[_from].totalApproved) < _value) {
             return false;
         }
 
         balances[_from].balance = math.sub(balances[_from].balance, _value);  
         balances[msg.sender].balance = math.add(balances[msg.sender].balance, _value);
 
+        Transfer(_from, msg.sender, _value);
         return true;
     }
 
     event Transfer(address indexed _from, address indexed _to, uint256 _value);
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+    event Burn(address indexed _who, uint256 _value);
 }
 
