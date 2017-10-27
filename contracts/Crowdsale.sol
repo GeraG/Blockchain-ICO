@@ -22,17 +22,21 @@ contract Crowdsale {
   event PurchaseCompleted(address buyer, bool successful);
   event RefundCompleted(address buyer, bool successful);
 
+
   modifier OwnerOnly() {
 		if (msg.sender == owner) {_;}
 	}
+
 
   modifier SaleHasEnded() {
 		if (now > startTime) {_;}
 	}
 
+
   modifier SaleHasNotEnded() {
 		if (now <= startTime) {_;}
 	}
+
 
   function Crowdsale(uint256 _exhangeRate, uint256 totalSupply, uint timeCap) {
     startTime = now;
@@ -43,9 +47,11 @@ contract Crowdsale {
     q = new Queue();
   }
 
+
   function mint(uint256 amount) OwnerOnly() {
     token.mint(amount);
   }
+
 
   function burn(uint256 amount) OwnerOnly() returns (bool) {
     if ((token.totalSupply - tokensSold) >= amount) {
@@ -54,6 +60,7 @@ contract Crowdsale {
     }
     return false;
   }
+
 
   function sell() payable SaleHasNotEnded() returns (bool) {
     uint sellTime = now;
@@ -82,6 +89,7 @@ contract Crowdsale {
     return success;
   }
 
+
   function refund(uint256 amount) SaleHasNotEnded() returns (bool) {
     success = token.refund(msg.sender, amount);
     if (success) {
@@ -90,6 +98,7 @@ contract Crowdsale {
     RefundCompleted(msg.sender, success);
     return success;
   }
+
 
   function receiveFunds() SaleHasEnded() OwnerOnly() returns (bool) {
     return owner.send(crowdSaleBalance);
