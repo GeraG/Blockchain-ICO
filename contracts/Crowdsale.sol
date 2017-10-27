@@ -68,10 +68,11 @@ contract Crowdsale {
     while (place > 1) {
       place = checkPlace();
     }
-    assert(q.checkPlace > 0); // should NEVER happen
+    assert(q.checkPlace > 0);  // should NEVER happen
 
     q.checkTime();
-    if (q.checkPlace() == 0) { // timeout
+    if (q.checkPlace() == 0) {  // timeout
+      msg.sender.send(msg.value);  // refund the ether from the purchase
       PurchaseCompleted(msg.sender, false);
       return false;
     }
