@@ -54,11 +54,7 @@ contract Crowdsale {
 
 
   function burn(uint256 amount) OwnerOnly() returns (bool) {
-    if ((token.totalSupply - tokensSold) >= amount) {
-      token.totalSupply -= amount;
-      return true;
-    }
-    return false;
+    return token.burn(amount);
   }
 
 
