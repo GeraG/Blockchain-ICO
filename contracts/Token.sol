@@ -15,6 +15,10 @@ contract Token is ERC20Interface {
 
     address owner;
 
+    event Transfer(address indexed _from, address indexed _to, uint256 _value);
+    event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+    event Burn(address indexed _who, uint256 _value);
+
     struct Approve {
         address spender;
         uint256 amountApproved;
@@ -167,15 +171,11 @@ contract Token is ERC20Interface {
             return false;
         }
 
-        balances[_from].balance = math.sub(balances[_from].balance, _value);  
+        balances[_from].balance = math.sub(balances[_from].balance, _value);
         balances[msg.sender].balance = math.add(balances[msg.sender].balance, _value);
 
         Transfer(_from, msg.sender, _value);
         return true;
     }
 
-    event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    event Approval(address indexed _owner, address indexed _spender, uint256 _value);
-    event Burn(address indexed _who, uint256 _value);
 }
-
