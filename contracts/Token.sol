@@ -148,7 +148,7 @@ contract Token is ERC20Interface {
         return ret;
     }
 
-    function refund(address _from, uint264 _value) OwnerOnly() returns (bool success) {
+    function refund(address _from, uint256 _value) OwnerOnly() returns (bool success) {
         if (math.sub(balances[_from].balance, balances[_from].amountApproved) < _value) {
             return false;
         }
