@@ -49,6 +49,16 @@ contract Crowdsale {
   }
 
 
+  function weiToDragonGlass(uint256 amountInWei) returns (uint256) {
+    return SafeMath.mul(amountInWei, exchangeRate);
+  }
+
+
+  function dragonGlassToWei(uint256 amountInDG) returns (uint256) {
+    return SafeMath.div(amountInDG, exchangeRate);
+  }
+
+
   function mint(uint256 amount) OwnerOnly() {
     token.mint(amount);
   }
@@ -60,7 +70,7 @@ contract Crowdsale {
 
 
   function sell() payable SaleHasNotEnded() returns (bool) {
-    uint256 tokensPurchased = SafeMath.mul(msg.value, exchangeRate);
+    uint256 tokensPurchased = weiToDragonGlass(msg.value);
 
     if (tokensPurchased > (token.totalSupply() - tokensSold)) {
       return false;
@@ -97,7 +107,7 @@ contract Crowdsale {
     bool success = token.refund(msg.sender, amount);
     if (success) {
       tokensSold = SafeMath.sub(tokensSold, amount);
-      uint256 refundInWei = SafeMath.div(amount, exchangeRate);
+      uint256 refundInWei = dragonGlassToWei(amount);
       success = msg.sender.send(refundInWei);
       if (success) {
         crowdSaleBalance = SafeMath.sub(crowdSaleBalance, refundInWei);
