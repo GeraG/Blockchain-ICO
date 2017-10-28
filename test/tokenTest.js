@@ -35,7 +35,7 @@ contract('testTemplate', function(accounts) {
 			balance = await token.balanceOf.call(accounts[1]);
 			assert.equal(balance.valueOf(), 10, "incorrect balance");
 		});
-		it("Testing transferFrom, Approve, and Allowance", async function() {
+		it("Testing transferFrom, approve, and allowance", async function() {
 			await token.approve(accounts[1], 50);
 			let allowance = await token.allowance.call(accounts[0], accounts[1]);
 			assert.equal(allowance.valueOf(), 50, "incorrect allowance");
