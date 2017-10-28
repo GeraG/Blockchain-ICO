@@ -2,33 +2,66 @@
 
 /* Add the dependencies you're testing */
 const Crowdsale = artifacts.require("./Crowdsale.sol");
-// YOUR CODE HERE
 
 contract('crowdsaleTest', function(accounts) {
-	/* Define your constant variables and instantiate constantly changing
-	 * ones
-	 */
-	const args = {};
-	let x, y, z;
-	// YOUR CODE HERE
+	const args = {exhangeRate: 1, totalSupply: 1000, timeCap: 50};
+	let crowdsale;
 
 	/* Do something before every `describe` method */
 	beforeEach(async function() {
-		queue = await Queue.new();
+		crowdsale = await Crowdsale.new(
+				args.exchangeRate,
+				args.totalSupply,
+				args.timeCap,
+		);
 	});
 
-	/* Group test cases together
-	 * Make sure to provide descriptive strings for method arguements and
-	 * assert statements
-	 */
-	describe('Unit Tests', function() {
-		it("your string here", async function() {
-			// YOUR CODE HERE
+	describe('Initialization Tests', function() {
+		it("Testing member variables initialization", async function() {
 		});
-		// YOUR CODE HERE
+		it("Testing wei to dragonglass conversion", async function() {
+		});
+		it("Testing dragonglass to wei conversion", async function() {
+		});
 	});
 
-	describe('Integration Tests', function() {
-		// YOUR CODE HERE
+	describe('Timing Tests', function() {
+		it("Testing sale ends after timeCap", async function() {
+			// TODO: implement
+		});
+		it("Testing sell and refund fail after sale ends", async function() {
+			// TODO: implement
+		});
+	});
+
+	describe('Sale Functionality Tests', function() {
+		it("Testing successful sales", async function() {
+			// TODO: implement
+			// NOTE: ensure that crowdSaleBalance is consistent with tokensSold
+		});
+		it("Testing failed sell due to timeout", async function() {
+			// TODO: implement
+		});
+		it("Testing failed sell due to insufficient funds", async function() {
+			// TODO: implement
+		});
+		it("Testing successful refunds", async function() {
+			// TODO: implement
+		});
+		it("Testing failed refund due to insufficient funds", async function() {
+			// TODO: implement
+		});
+		it("Testing funds tranferred to owner at end of sale", async function() {
+			// TODO: implement
+		});
+	});
+
+	describe('Security and Permission Tests', function() {
+		it("Testing minting and burning fails for non-owner", async function() {
+			// TODO: implement
+		});
+		it("Testing receiveFunds fails for non-owner", async function() {
+			// TODO: implement
+		});
 	});
 });
