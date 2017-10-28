@@ -2,6 +2,7 @@ pragma solidity ^0.4.15;
 
 import './Queue.sol';
 import './Token.sol';
+import './utils/SafeMath.sol';
 
 /**
  * @title Crowdsale
@@ -40,11 +41,23 @@ contract Crowdsale {
 
   function Crowdsale(uint256 _exhangeRate, uint256 totalSupply, uint timeCap) {
     startTime = now;
-    endTime = startTime + timeCap;
+    endTime = SafeMath.add(startTime, timeCap);
     owner = msg.sender;
     token = new Token(totalSupply);
     exchangeRate = _exhangeRate;
     q = new Queue();
+    tokensSold = 0;
+    crowdSaleBalance = 0;
+  }
+
+
+  function weiToDragonGlass(uint256 amountInWei) returns (uint256) {
+    return SafeMath.mul(amountInWei, exchangeRate);
+  }
+
+
+  function dragonGlassToWei(uint256 amountInDG) returns (uint256) {
+    return SafeMath.div(amountInDG, exchangeRate);
   }
 
 
@@ -59,8 +72,7 @@ contract Crowdsale {
 
 
   function sell() payable SaleHasNotEnded() returns (bool) {
-    uint sellTime = now;
-    uint256 tokensPurchased = msg.value * exchangeRate;
+    uint256 tokensPurchased = weiToDragonGlass(msg.value);
 
     if (tokensPurchased > (token.totalSupply() - tokensSold)) {
       return false;
@@ -84,6 +96,10 @@ contract Crowdsale {
     }
     q.dequeue();
     bool success = token.transfer(msg.sender, tokensPurchased);
+    if (success) {
+      crowdSaleBalance = SafeMath.add(crowdSaleBalance, msg.value);
+      tokensSold = SafeMath.add(tokensSold, tokensPurchased);
+    }
     PurchaseCompleted(msg.sender, success);
     return success;
   }
@@ -92,7 +108,12 @@ contract Crowdsale {
   function refund(uint256 amount) SaleHasNotEnded() returns (bool) {
     bool success = token.refund(msg.sender, amount);
     if (success) {
-      success = msg.sender.send(amount);
+      tokensSold = SafeMath.sub(tokensSold, amount);
+      uint256 refundInWei = dragonGlassToWei(amount);
+      success = msg.sender.send(refundInWei);
+      if (success) {
+        crowdSaleBalance = SafeMath.sub(crowdSaleBalance, refundInWei);
+      }
     }
     RefundCompleted(msg.sender, success);
     return success;
@@ -100,6 +121,10 @@ contract Crowdsale {
 
 
   function receiveFunds() SaleHasEnded() OwnerOnly() returns (bool) {
-    return owner.send(crowdSaleBalance);
+    bool success = owner.send(crowdSaleBalance);
+    if (success) {
+      crowdSaleBalance = 0;
+    }
+    return success;
   }
 }
