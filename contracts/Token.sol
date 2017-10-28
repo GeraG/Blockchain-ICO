@@ -1,7 +1,7 @@
 pragma solidity ^0.4.15;
 
 import './interfaces/ERC20Interface.sol';
-import './utils/SafeMath.sol' as math;
+import './utils/SafeMath.sol';
 
 /**
  * @title Token
@@ -44,8 +44,8 @@ contract Token is ERC20Interface {
     }
 
     function mint(uint256 balance) OwnerOnly() {
-        totalSupply = math.add(totalSupply, balance);
-        balances[msg.sender].balance = math.add(balances[msg.sender].balance, balance);
+        totalSupply = SafeMath.add(totalSupply, balance);
+        balances[msg.sender].balance = SafeMath.add(balances[msg.sender].balance, balance);
     }
 
     /// @param _owner The address from which the balance will be retrieved
@@ -63,8 +63,8 @@ contract Token is ERC20Interface {
             return false;
         }
 
-        balances[msg.sender].balance = math.sub(balances[msg.sender].balance, _value);
-        balances[_to].balance = math.add(balances[_to].balance, _value);
+        balances[msg.sender].balance = SafeMath.sub(balances[msg.sender].balance, _value);
+        balances[_to].balance = SafeMath.add(balances[_to].balance, _value);
 
         Transfer(msg.sender, _to, _value);
         return true;
@@ -89,10 +89,10 @@ contract Token is ERC20Interface {
                 }
 
                 // Transfer
-                approvalArray[s].amountApproved = math.sub(approvalArray[s].amountApproved, _value);
-                balances[_from].totalApproved = math.sub(balances[_from].totalApproved, _value);
-                balances[_from].balance = math.sub(balances[_from].balance, _value);
-                balances[_to].balance = math.add(balances[_to].balance, _value);
+                approvalArray[s].amountApproved = SafeMath.sub(approvalArray[s].amountApproved, _value);
+                balances[_from].totalApproved = SafeMath.sub(balances[_from].totalApproved, _value);
+                balances[_from].balance = SafeMath.sub(balances[_from].balance, _value);
+                balances[_to].balance = SafeMath.add(balances[_to].balance, _value);
 
                 Transfer(_from, _to, _value);
                 return true;
@@ -112,7 +112,7 @@ contract Token is ERC20Interface {
             return false;
         }
 
-        if (balances[msg.sender].balance < math.add(balances[msg.sender].totalApproved, _value)) {
+        if (balances[msg.sender].balance < SafeMath.add(balances[msg.sender].totalApproved, _value)) {
             return false;
         }
 
@@ -120,7 +120,7 @@ contract Token is ERC20Interface {
         bool done = false;
         for (uint s = 0; s < approvalArray.length; s++) {
             if (approvalArray[s].spender == _spender) {
-                approvalArray[s].amountApproved = math.add(approvalArray[s].amountApproved, _value);
+                approvalArray[s].amountApproved = SafeMath.add(approvalArray[s].amountApproved, _value);
                 done = true;
                 break;
             }
@@ -130,7 +130,7 @@ contract Token is ERC20Interface {
             approvalArray.push(Approve(_spender, _value));
         }
 
-        balances[msg.sender].totalApproved = math.add(balances[msg.sender].totalApproved, _value);
+        balances[msg.sender].totalApproved = SafeMath.add(balances[msg.sender].totalApproved, _value);
         Approval(msg.sender, _spender, _value);
         return true;
     }
@@ -154,12 +154,12 @@ contract Token is ERC20Interface {
 
     function burn(uint256 _value) returns (bool success) {
         // Can only burn the remaining tokens not approved to anyone
-        if (math.sub(balances[msg.sender].balance, balances[msg.sender].totalApproved) < _value) {
+        if (SafeMath.sub(balances[msg.sender].balance, balances[msg.sender].totalApproved) < _value) {
             return false;
         }
 
-        balances[msg.sender].balance = math.sub(balances[msg.sender].balance, _value);
-        totalSupply = math.sub(totalSupply, _value);
+        balances[msg.sender].balance = SafeMath.sub(balances[msg.sender].balance, _value);
+        totalSupply = SafeMath.sub(totalSupply, _value);
 
         Burn(msg.sender, _value);
         return true;
@@ -167,12 +167,12 @@ contract Token is ERC20Interface {
 
     function refund(address _from, uint256 _value) OwnerOnly() returns (bool success) {
         // Can only take out the remaining tokens not approved to anyone
-        if (math.sub(balances[_from].balance, balances[_from].totalApproved) < _value) {
+        if (SafeMath.sub(balances[_from].balance, balances[_from].totalApproved) < _value) {
             return false;
         }
 
-        balances[_from].balance = math.sub(balances[_from].balance, _value);
-        balances[msg.sender].balance = math.add(balances[msg.sender].balance, _value);
+        balances[_from].balance = SafeMath.sub(balances[_from].balance, _value);
+        balances[msg.sender].balance = SafeMath.add(balances[msg.sender].balance, _value);
 
         Transfer(_from, msg.sender, _value);
         return true;
