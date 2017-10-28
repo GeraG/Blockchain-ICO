@@ -62,7 +62,7 @@ contract Crowdsale {
     uint sellTime = now;
     uint256 tokensPurchased = msg.value * exchangeRate;
 
-    if (tokensPurchased > (totalSupply - tokensSold)) {
+    if (tokensPurchased > (token.totalSupply() - tokensSold)) {
       return false;
     }
 
@@ -70,11 +70,11 @@ contract Crowdsale {
     while (q.checkPlace() > 1) {  // wait until first in line
       continue;
     }
-    assert(q.checkPlace > 0);  // should NEVER happen
+    assert(q.checkPlace() > 0);  // should NEVER happen
 
     q.checkTime();
     if (q.checkPlace() == 0) {  // timeout. should already be dequeued now
-      msg.sender.send(msg.value);  // refund the ether from the purchase
+      assert(msg.sender.send(msg.value));  // refund ether (should always pass!)
       PurchaseCompleted(msg.sender, false);
       return false;
     }
@@ -90,7 +90,7 @@ contract Crowdsale {
 
 
   function refund(uint256 amount) SaleHasNotEnded() returns (bool) {
-    success = token.refund(msg.sender, amount);
+    bool success = token.refund(msg.sender, amount);
     if (success) {
       success = msg.sender.send(amount);
     }
