@@ -58,7 +58,7 @@ contract Token is ERC20Interface {
     /// @param _value The amount of token to be transferred
     /// @return Whether the transfer was successful or not
     function transfer(address _to, uint256 _value) returns (bool success) {
-        if (balances[msg.sender].balance < _value) {
+        if (balances[msg.sender].balance < SafeMath.add(balances[msg.sender].totalApproved, _value)) {
             Transfer(msg.sender, _to, 0);
             return false;
         }
@@ -76,10 +76,10 @@ contract Token is ERC20Interface {
     /// @param _value The amount of token to be transferred
     /// @return Whether the transfer was successful or not
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
-        if (balances[_from].balance < _value) {
-            Transfer(_from, _to, 0);
-            return false;
-        }
+        // if (balances[_from].balance < _value) {
+        //     Transfer(_from, _to, 0);
+        //     return false;
+        // }
 
         Approve[] storage approvalArray = approvals[_from];
 
