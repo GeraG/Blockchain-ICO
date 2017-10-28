@@ -36,7 +36,6 @@ contract Token is ERC20Interface {
     mapping(address => Balance) private balances;
     mapping(address => Approve[]) private approvals;
 
-
     function Token(uint256 _totalSupply) {
         owner = msg.sender;
         totalSupply = _totalSupply;
@@ -60,6 +59,7 @@ contract Token is ERC20Interface {
     /// @return Whether the transfer was successful or not
     function transfer(address _to, uint256 _value) returns (bool success) {
         if (balances[msg.sender].balance < _value) {
+            Transfer(msg.sender, _to, 0);
             return false;
         }
 
@@ -77,6 +77,7 @@ contract Token is ERC20Interface {
     /// @return Whether the transfer was successful or not
     function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
         if (balances[_from].balance < _value) {
+            Transfer(_from, _to, 0);
             return false;
         }
 
@@ -85,6 +86,7 @@ contract Token is ERC20Interface {
         for (uint s = 0; s < approvalArray.length; s++) {
             if (approvalArray[s].spender == msg.sender) {
                 if (approvalArray[s].amountApproved < _value) {
+                    Transfer(_from, _to, 0);
                     return false;
                 }
 
@@ -109,10 +111,12 @@ contract Token is ERC20Interface {
     /// @return Whether the approval was successful or not
     function approve(address _spender, uint256 _value) returns (bool success) {
         if (msg.sender == _spender) {
+            Approval(msg.sender, _spender, 0);
             return false;
         }
 
         if (balances[msg.sender].balance < SafeMath.add(balances[msg.sender].totalApproved, _value)) {
+            Approval(msg.sender, _spender, 0);
             return false;
         }
 
@@ -168,6 +172,7 @@ contract Token is ERC20Interface {
     function refund(address _from, uint256 _value) OwnerOnly() returns (bool success) {
         // Can only take out the remaining tokens not approved to anyone
         if (SafeMath.sub(balances[_from].balance, balances[_from].totalApproved) < _value) {
+            Transfer(_from, msg.sender, 0);
             return false;
         }
 
