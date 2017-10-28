@@ -22,7 +22,7 @@ contract('testTemplate', function(accounts) {
 	 * Make sure to provide descriptive strings for method arguements and
 	 * assert statements
 	 */
-	describe('Token Works', function() {
+	describe('Token functionality', function() {
 		it("Testing transfer", async function() {
 			let balance = await token.balanceOf.call(accounts[0]);
 			assert.equal(balance.valueOf(), args._supply, "incorrect balance");
@@ -35,7 +35,7 @@ contract('testTemplate', function(accounts) {
 			balance = await token.balanceOf.call(accounts[1]);
 			assert.equal(balance.valueOf(), 10, "incorrect balance");
 		});
-		it("Testing transferFrom, Approve, and Allowance", async function() {
+		it("Testing transferFrom, approve, and allowance", async function() {
 			await token.approve(accounts[1], 50);
 			let allowance = await token.allowance.call(accounts[0], accounts[1]);
 			assert.equal(allowance.valueOf(), 50, "incorrect allowance");
@@ -51,6 +51,49 @@ contract('testTemplate', function(accounts) {
 			await token.approve(accounts[2], 150);
 			allowance = await token.allowance.call(accounts[0], accounts[2]);
 			assert.equal(allowance.valueOf(), 150, "incorrect allowance");
+
+			await token.transferFrom(accounts[0], accounts[3], 10, {from: accounts[2]});
+			allowance = await token.allowance.call(accounts[0], accounts[2]);
+			assert.equal(allowance.valueOf(), 140, "incorrect allowance");
+
+			await token.transferFrom(accounts[0], accounts[3], 10, {from: accounts[1]});
+			allowance = await token.allowance.call(accounts[0], accounts[1]);
+			assert.equal(allowance.valueOf(), 90, "incorrect allowance");
+
+			await token.transferFrom(accounts[0], accounts[2], 100, {from: accounts[1]});
+			allowance = await token.allowance.call(accounts[0], accounts[1]);
+			assert.equal(allowance.valueOf(), 90, "incorrect allowance");
+
+			allowance = await token.allowance.call(accounts[0], accounts[2]);
+			assert.equal(allowance.valueOf(), 140, "incorrect allowance");
+
+			let balance = await token.balanceOf.call(accounts[3]);
+			assert.equal(balance.valueOf(), 20, "incorrect balance");
+
+			await token.approve(accounts[5], 10, {from: accounts[3]});
+			allowance = await token.allowance.call(accounts[3], accounts[5]);
+			assert.equal(allowance.valueOf(), 10, "incorrect allowance");
+
+			await token.transferFrom(accounts[3], accounts[6], 20, {from: accounts[5]});
+			balance = await token.balanceOf.call(accounts[3]);
+			assert.equal(balance.valueOf(), 20, "incorrect balance");
+
+			await token.transferFrom(accounts[3], accounts[6], 10, {from: accounts[5]});
+			balance = await token.balanceOf.call(accounts[3]);
+			assert.equal(balance.valueOf(), 10, "incorrect balance");
+
+			balance = await token.balanceOf.call(accounts[0]);
+			assert.equal(balance.valueOf(), args._supply - 20, "incorrect balance");
+
+			await token.transfer(accounts[3], 900);
+			balance = await token.balanceOf.call(accounts[0]);
+			assert.equal(balance.valueOf(), 980, "incorrect balance");
+
+			await token.transfer(accounts[3], 20);
+			balance = await token.balanceOf.call(accounts[3]);
+			assert.equal(balance.valueOf(), 30, "incorrect balance");
+			balance = await token.balanceOf.call(accounts[0]);
+			assert.equal(balance.valueOf(), args._supply - 40, "incorrect balance");
 		});
 		it("Testing mint", async function() {
 			await token.mint(100);
