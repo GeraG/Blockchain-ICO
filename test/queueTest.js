@@ -59,7 +59,7 @@ contract('queueTest', function(accounts) {
 			// add 5 people to the queue.
 			var i;
 			for (i = 0; i < 5; i++) {
-				await queue.enqueue(accounts[0]);
+				await queue.enqueue(accounts[i]);
 			}
 			var queueSize = await queue.qsize();
 			assert.equal(queueSize, 5, "The queue should have a size of 5.");
@@ -72,6 +72,24 @@ contract('queueTest', function(accounts) {
 			assert.equal(pos.valueOf(), 0, "The 6th person should not have a place in the queue.");
 		});
 
+		it("Add and remove 5 people from the queue.", async function() {
+			// add 5 people to the queue.
+			var i;
+			var queueSize;
+			for (i = 0; i < 5; i++) {
+				await queue.enqueue(accounts[i]);
+				queueSize = await queue.qsize();
+				assert.equal(queueSize, i+1, "The queue is not the correct size.");
+			}
+
+			var queueSize;
+			for (i = 0; i < 5; i++) {
+				await queue.dequeue();
+				queueSize = await queue.qsize();
+				assert.equal(queueSize,5-(i+1), "The queue is not the correct size.");
+			}
+		});
+		
 		// this test doesn't work yet since i need to figure out timing.
 		// it("Expel the person in the front of the queue.", async function() {
 		// 	await queue.enqueue(accounts[0]);
