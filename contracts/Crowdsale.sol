@@ -46,6 +46,8 @@ contract Crowdsale {
     token = new Token(totalSupply);
     exchangeRate = _exhangeRate;
     q = new Queue();
+    tokensSold = 0;
+    crowdSaleBalance = 0;
   }
 
 
@@ -119,6 +121,10 @@ contract Crowdsale {
 
 
   function receiveFunds() SaleHasEnded() OwnerOnly() returns (bool) {
-    return owner.send(crowdSaleBalance);
+    bool success = owner.send(crowdSaleBalance);
+    if (success) {
+      crowdSaleBalance = 0;
+    }
+    return success;
   }
 }
