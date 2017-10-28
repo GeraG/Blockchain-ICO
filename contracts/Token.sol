@@ -1,7 +1,7 @@
 pragma solidity ^0.4.15;
 
 import './interfaces/ERC20Interface.sol';
-import './interfaces/SafeMath.sol' as math;
+import './utils/SafeMath.sol' as math;
 
 /**
  * @title Token
@@ -80,7 +80,7 @@ contract Token is ERC20Interface {
             return false;
         }
 
-        Approve[] approvalArray = approvals[_from];
+        Approve[] storage approvalArray = approvals[_from];
 
         for (uint s = 0; s < approvalArray.length; s++) {
             if (approvalArray[s].spender == msg.sender) {
@@ -116,7 +116,7 @@ contract Token is ERC20Interface {
             return false;
         }
 
-        Approve[] approvalArray = approvals[msg.sender];
+        Approve[] storage approvalArray = approvals[msg.sender];
         bool done = false;
         for (uint s = 0; s < approvalArray.length; s++) {
             if (approvalArray[s].spender == _spender) {
@@ -141,7 +141,7 @@ contract Token is ERC20Interface {
     function allowance(address _owner, address _spender) constant returns (uint256 remaining) {
         uint256 ret = 0;
 
-        Approve[] approvalArray = approvals[_owner];
+        Approve[] storage approvalArray = approvals[_owner];
         for (uint s = 0; s < approvalArray.length; s++) {
             if (approvalArray[s].spender == _spender) {
                 ret = approvalArray[s].amountApproved;
