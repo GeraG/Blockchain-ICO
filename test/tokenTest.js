@@ -4,8 +4,8 @@
 const Token = artifacts.require("./Token.sol");
 // YOUR CODE HERE
 
-contract('testTemplate', function(accounts) {
-	/* Define your constant variables and instantiate constantly changing 
+contract('tokenTest', function(accounts) {
+	/* Define your constant variables and instantiate constantly changing
 	 * ones
 	 */
 	const args = {_supply: 1000};
@@ -18,7 +18,7 @@ contract('testTemplate', function(accounts) {
 		token = await Token.new(args._supply);
 	});
 
-	/* Group test cases together 
+	/* Group test cases together
 	 * Make sure to provide descriptive strings for method arguements and
 	 * assert statements
 	 */
