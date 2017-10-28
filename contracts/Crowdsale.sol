@@ -11,14 +11,14 @@ import './utils/SafeMath.sol';
  */
 
 contract Crowdsale {
-  address private owner;
-  uint256 private tokensSold;
-  uint256 private crowdSaleBalance;
-  uint private startTime;
-  uint private endTime;
+  address public owner;
+  uint256 public tokensSold;
+  uint256 public crowdSaleBalance;
+  uint public startTime;
+  uint public endTime;
   uint256 public exchangeRate;
   Token private token;
-  Queue public q;
+  Queue private q;
 
   event PurchaseCompleted(address buyer, bool successful);
   event RefundCompleted(address buyer, bool successful);
