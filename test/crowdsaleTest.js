@@ -25,6 +25,7 @@ contract('crowdsaleTest', function(accounts) {
 		  let crowdSaleBalance = await crowdsale.crowdSaleBalance.call();
 		  let startTime = await crowdsale.startTime.call();
 		  let endTime = await crowdsale.endTime.call();
+			let linesize = await crowdsale.lineSize.call();
 
 			assert.equal(clients._owner, owner.valueOf(), "Owner not set");
 			assert.equal(0, tokensSold.valueOf(), "tokensSold should initially be 0");
@@ -34,6 +35,7 @@ contract('crowdsaleTest', function(accounts) {
 				startTime.valueOf(),
 				"sale end time is not after start time",
 			);
+			assert.equal(linesize, 0, "Queue should be initially empty");
 		});
 	});
 
@@ -60,12 +62,21 @@ contract('crowdsaleTest', function(accounts) {
 		it("Testing successful sales", async function() {
 			let tokensSold = await crowdsale.tokensSold.call();
 			let crowdSaleBalance = await crowdsale.crowdSaleBalance.call();
-			assert.equal(tokensSold.valueOf(), 0);
-			assert.equal(crowdSaleBalance.valueOf(), 0);
+			assert.equal(tokensSold.valueOf(), 0, "Tokens sold should be 0 before any sale");
+			assert.equal(crowdSaleBalance.valueOf(), 0, "Crowdsale balance should be 0 before any sale");
 
-			// TODO: fix failure below
-			// let success = await crowdsale.sell.call({from: clients.user1, value: 20});
-			// assert(success, "simple sell failed");
+			let size = await crowdsale.lineSize.call();
+			assert.equal(size, 0, "Line size should be 0 at beginning of sale");
+			await crowdsale.getInLine.call(clients.user1);
+			size = await crowdsale.lineSize.call();
+			assert.equal(size, 1, "Line size should be 1 for single seller before purchase completes");
+			let first = await crowdsale.firstInLine.call();
+			assert.equal(first , clients.user1, "Solitary buyer should be first in line after enqueue");
+
+			let success = await crowdsale.sell.call({from: clients.user1, value: 20});
+			assert(success, "simple sell failed");
+
+
 			// tokensSold = await crowdsale.tokensSold.call();
 			// crowdSaleBalance = await crowdsale.crowdSaleBalance.call();
 			// assert.equal(
@@ -78,8 +89,6 @@ contract('crowdsaleTest', function(accounts) {
 			// 	20 * args.exchangeRate,
 			// 	"tokensSold not updated after successful sale",
 			// );
-
-			// NOTE: ensure that crowdSaleBalance is consistent with tokensSold
 		});
 		it("Testing failed sell due to timeout", async function() {
 			// TODO: implement
