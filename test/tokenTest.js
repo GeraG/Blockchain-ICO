@@ -2,7 +2,6 @@
 
 /* Add the dependencies you're testing */
 const Token = artifacts.require("./Token.sol");
-// YOUR CODE HERE
 
 contract('tokenTest', function(accounts) {
 	/* Define your constant variables and instantiate constantly changing
@@ -10,11 +9,9 @@ contract('tokenTest', function(accounts) {
 	 */
 	const args = {_supply: 1000};
 	let token;
-	// YOUR CODE HERE
 
 	/* Do something before every `describe` method */
 	beforeEach(async function() {
-		// YOUR CODE HERE
 		token = await Token.new(args._supply);
 	});
 
