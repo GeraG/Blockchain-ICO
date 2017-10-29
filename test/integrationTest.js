@@ -2,19 +2,29 @@
 
 /* Add the dependencies you're testing */
 const Crowdsale = artifacts.require("./Crowdsale.sol");
-// YOUR CODE HERE
+const Token = artifacts.require("./Token.sol");
+const Queue = artifacts.require("./Queue.sol");
 
 contract('integrationTest', function(accounts) {
 	/* Define your constant variables and instantiate constantly changing 
 	 * ones
 	 */
-	const args = {};
-	let x, y, z;
-	// YOUR CODE HERE
+ 	const args = {exchangeRate: 5, totalSupply: 1000, timeCap: 5000};
+	const clients = {_owner: accounts[1], user1: accounts[2], user2: accounts[3]};
+
+	let crowdsale, token, queue;
 
 	/* Do something before every `describe` method */
 	beforeEach(async function() {
-		// YOUR CODE HERE
+		crowdsale = await Crowdsale.new(
+				args.exchangeRate,
+				args.totalSupply,
+				args.timeCap,
+				{from: clients._owner},
+		);
+		token = Token.at(await crowdsale.token());
+		queue = Queue.at(await crowdsale.q())
+
 	});
 
 	/* Group test cases together 
@@ -24,7 +34,10 @@ contract('integrationTest', function(accounts) {
 	describe('Basic Functionality', function() {
 
 		it("Testing purchase", async function() {
-			// YOUR CODE HERE
+			// await queue.enqueue(args.user1);
+			// await queue.enqueue(args.user2);
+			// let success = await crowdsale.sell({from: clients.user1, value: 10});
+			// assert.equal(success, true, "purchase failed");
 		});
 
 		it("Testing refunds", async function() {
@@ -38,7 +51,7 @@ contract('integrationTest', function(accounts) {
 	});
 
 	describe('Advanced Functionality', function() {
-		
+
 		it("Testing transfer", async function() {
 			// YOUR CODE HERE
 		});

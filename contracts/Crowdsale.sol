@@ -17,8 +17,8 @@ contract Crowdsale {
   uint public startTime;
   uint public endTime;
   uint256 public exchangeRate;
-  Token private token;
-  Queue private q;
+  Token public token;
+  Queue public q;
 
   event PurchaseCompleted(address buyer, bool successful);
   event RefundCompleted(address buyer, bool successful);

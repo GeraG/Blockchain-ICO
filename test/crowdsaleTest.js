@@ -5,7 +5,7 @@ const Crowdsale = artifacts.require("./Crowdsale.sol");
 
 contract('crowdsaleTest', function(accounts) {
 	const args = {exchangeRate: 5, totalSupply: 1000, timeCap: 5000};
-	const clients = {_owner: accounts[1], user1: accounts[2], user2: accounts[3]};
+	const clients = {_owner: accounts[0], user1: accounts[1], user2: accounts[2]};
 	let crowdsale;
 
 	/* Do something before every `describe` method */
@@ -58,20 +58,20 @@ contract('crowdsaleTest', function(accounts) {
 			assert.equal(way.valueOf(), dg / args.exchangeRate, "dg to wei exchange incorrect");
 		});
 		it("Testing successful sales", async function() {
-			let tokensSold = await crowdsale.tokensSold.call();
-			let crowdSaleBalance = await crowdsale.crowdSaleBalance.call();
+			var tokensSold = await crowdsale.tokensSold.call();
+			var crowdSaleBalance = await crowdsale.crowdSaleBalance.call();
 			assert.equal(tokensSold.valueOf(), 0);
 			assert.equal(crowdSaleBalance.valueOf(), 0);
 
 			// TODO: fix failure below
-			// let success = await crowdsale.sell.call({from: clients.user1, value: 20});
-			// assert(success, "simple sell failed");
+			// let success = await crowdsale.sell({from: clients.user1, value: 20});
+			// assert.isTrue(success, "simple sell failed");
 			// tokensSold = await crowdsale.tokensSold.call();
 			// crowdSaleBalance = await crowdsale.crowdSaleBalance.call();
 			// assert.equal(
-			// 	crowdSaleBalance,
-			// 	20,
-			// 	"crowdSaleBalance not updated after successful sale",
+				// crowdSaleBalance,
+				// 20,
+				// "crowdSaleBalance not updated after successful sale",
 			// );
 			// assert.equal(
 			// 	tokensSold,
