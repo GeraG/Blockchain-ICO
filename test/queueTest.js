@@ -89,19 +89,21 @@ contract('queueTest', function(accounts) {
 				assert.equal(queueSize,5-(i+1), "The queue is not the correct size.");
 			}
 		});
-		
-		// this test doesn't work yet since i need to figure out timing.
-		// it("Expel the person in the front of the queue.", async function() {
-		// 	await queue.enqueue(accounts[0]);
-		// 	await queue.enqueue(accounts[1]);
-		// 	await queue.checkTime();
-		// 	let queueSize = await queue.qsize();
-		// 	assert.equal(queueSize, 1, "The queue should have a size of 1, but was " + queueSize);
-		// 	var pos = await queue.checkPlace.call({from: accounts[0]}).valueOf();
-		// 	assert.equal(pos, 0, "The expelled person should no longer be in the queue.");
-		// 	pos = await queue.checkPlace.call({from: accounts[1]}).valueOf();
-		// 	assert.equal(pos, 1, "The correct person is not in front of the queue.");
 
-		// });
+		it("Expel the person in the front of the queue.", async function() {
+			await queue.enqueue(accounts[0]);
+			await queue.enqueue(accounts[1]);
+			var queueSize = await queue.qsize();
+			while (queueSize > 1) {
+				await queue.checkTime();
+				queueSize = await queue.qsize();
+			}
+			assert.equal(queueSize, 1, "The queue should have a size of 1, but was " + queueSize);
+			var pos = await queue.checkPlace.call({from: accounts[0]}).valueOf();
+			assert.equal(pos, 0, "The expelled person should no longer be in the queue.");
+			pos = await queue.checkPlace.call({from: accounts[1]}).valueOf();
+			assert.equal(pos, 1, "The correct person is not in front of the queue.");
+
+		});
 	});
 });

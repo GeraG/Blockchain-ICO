@@ -21,14 +21,27 @@ contract('integrationTest', function(accounts) {
 	 * Make sure to provide descriptive strings for method arguements and
 	 * assert statements
 	 */
-	describe('Your string here', function() {
-		it("your string here", async function() {
+	describe('Basic Functionality', function() {
+
+		it("Testing purchase", async function() {
 			// YOUR CODE HERE
 		});
-		// YOUR CODE HERE
+
+		it("Testing refunds", async function() {
+			// YOUR CODE HERE
+		});
+
+		it("Testing transfer", async function() {
+			// YOUR CODE HERE
+		});
+
 	});
 
-	describe('Your string here', function() {
-		// YOUR CODE HERE
+	describe('Advanced Functionality', function() {
+		
+		it("Testing transfer", async function() {
+			// YOUR CODE HERE
+		});
+
 	});
 });
