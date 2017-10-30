@@ -76,13 +76,15 @@ contract('queueTest', function(accounts) {
 			// add 5 people to the queue.
 			var i;
 			var queueSize;
+			var pos;
 			for (i = 0; i < 5; i++) {
 				await queue.enqueue(accounts[i]);
 				queueSize = await queue.qsize();
 				assert.equal(queueSize, i+1, "The queue is not the correct size.");
+				pos = await queue.checkPlace.call({from: accounts[i]});
+				assert.equal(pos, i+1, "Check place did not return the correct position.");
 			}
 
-			var queueSize;
 			for (i = 0; i < 5; i++) {
 				await queue.dequeue();
 				queueSize = await queue.qsize();

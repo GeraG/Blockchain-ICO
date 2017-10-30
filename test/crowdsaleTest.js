@@ -2,11 +2,13 @@
 
 /* Add the dependencies you're testing */
 const Crowdsale = artifacts.require("./Crowdsale.sol");
+const Token = artifacts.require("./Token.sol");
+const Queue = artifacts.require("./Queue.sol");
 
 contract('crowdsaleTest', function(accounts) {
 	const args = {exchangeRate: 5, totalSupply: 1000, timeCap: 5000};
 	const clients = {_owner: accounts[0], user1: accounts[1], user2: accounts[2]};
-	let crowdsale;
+	let crowdsale, token, queue;
 
 	/* Do something before every `describe` method */
 	beforeEach(async function() {
@@ -16,6 +18,8 @@ contract('crowdsaleTest', function(accounts) {
 				args.timeCap,
 				{from: clients._owner},
 		);
+		token = Token.at(await crowdsale.token());
+		queue = Queue.at(await crowdsale.q())
 	});
 
 	describe('Init Tests', function() {
@@ -83,7 +87,7 @@ contract('crowdsaleTest', function(accounts) {
 				0,
 				"Line size should be 0 at beginning of sale",
 			);
-			await crowdsale.getInLine.call(clients.user1);
+			await crowdsale.getInLine(clients.user1);
 			let size2 = await crowdsale.lineSize.call();
 			assert.equal(
 				size2.valueOf(),
