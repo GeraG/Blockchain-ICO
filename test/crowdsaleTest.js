@@ -119,7 +119,7 @@ contract('crowdsaleTest', function(accounts) {
 				"The same buyer should be first in line, even after enqueue",
 			);
 
-			let success2 = await crowdsale.sell.call({from: clients.user1, value: 1});
+			let success2 = await crowdsale.sell.call({from: clients.user1, value: 20});
 			assert(success2.valueOf(), "simple sell failed");
 
 
