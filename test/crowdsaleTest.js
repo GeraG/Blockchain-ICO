@@ -57,21 +57,45 @@ contract('crowdsaleTest', function(accounts) {
 		it("Testing dragonglass to wei conversion", async function() {
 			let dg = 1000;
 			let way = await crowdsale.dragonGlassToWei.call(dg);
-			assert.equal(way.valueOf(), dg / args.exchangeRate, "dg to wei exchange incorrect");
+			assert.equal(
+				way.valueOf(),
+				dg / args.exchangeRate,
+				"dg to wei exchange incorrect",
+			);
 		});
 		it("Testing successful sales", async function() {
 			var tokensSold = await crowdsale.tokensSold.call();
 			var crowdSaleBalance = await crowdsale.crowdSaleBalance.call();
-			assert.equal(tokensSold.valueOf(), 0, "Tokens sold should be 0 before any sale");
-			assert.equal(crowdSaleBalance.valueOf(), 0, "Crowdsale balance should be 0 before any sale");
+			assert.equal(
+				tokensSold.valueOf(),
+				0,
+				"Tokens sold should be 0 before any sale",
+			);
+			assert.equal(
+				crowdSaleBalance.valueOf(),
+				0,
+				"Crowdsale balance should be 0 before any sale",
+			);
 
 			let size1 = await crowdsale.lineSize.call();
-			assert.equal(size1.valueOf(), 0, "Line size should be 0 at beginning of sale");
+			assert.equal(
+				size1.valueOf(),
+				0,
+				"Line size should be 0 at beginning of sale",
+			);
 			await crowdsale.getInLine.call(clients.user1);
 			let size2 = await crowdsale.lineSize.call();
-			assert.equal(size2.valueOf(), 1, "Line size should be 1 for single seller before purchase completes");
+			assert.equal(
+				size2.valueOf(),
+				1,
+				"Line size should be 1 for single seller before purchase completes",
+			);
 			let first = await crowdsale.firstInLine.call();
-			assert.equal(first.valueOf(), clients.user1, "Solitary buyer should be first in line after enqueue");
+			assert.equal(
+				first.valueOf(),
+				clients.user1,
+				"Solitary buyer should be first in line after enqueue",
+			);
 
 			let success = await crowdsale.sell.call({from: clients.user1, value: 20});
 			assert(success.valueOf(), "simple sell failed");
