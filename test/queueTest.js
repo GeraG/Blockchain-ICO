@@ -99,10 +99,8 @@ contract('queueTest', function(accounts) {
 			web3.currentProvider.send({jsonrpc: "2.0", method: "evm_mine", params: [], id: 0});
 
 			var queueSize = await queue.qsize();
-			while (queueSize > 1) {
-				await queue.checkTime();
-				queueSize = await queue.qsize();
-			}
+			await queue.checkTime();
+			queueSize = await queue.qsize();
 			assert.equal(queueSize, 1, "The queue should have a size of 1, but was " + queueSize);
 			var pos = await queue.checkPlace.call({from: accounts[0]}).valueOf();
 			assert.equal(pos, 0, "The expelled person should no longer be in the queue.");

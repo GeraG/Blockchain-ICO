@@ -150,34 +150,20 @@ contract('crowdsaleTest', function(accounts) {
 			// );
 		});
 
-
-
 		it("Testing failed sell due to insufficient funds", async function() {
-			// TODO: implement
+			await crowdsale.getInLine(clients.user1);
+			await crowdsale.getInLine(clients.user2);
+			var success = await crowdsale.sell.call({from: clients.user1, value: 100});
+			assert(success, "Sale failed.");
+			success = await crowdsale.sell.call({from: clients.user1, value: 1000});
+			assert.isFalse(success, "Sale should fail due to insufficient funds.");
+
+			
 		});
 
 		it("Testing failed sell due to sale cap exceeded", async function() {
 			await crowdsale.getInLine(clients.user1);
-			var size = await crowdsale.lineSize.call();
-			assert.equal(
-				size.valueOf(),
-				1,
-				"Line size should be 1 for single seller before purchase completes",
-			);
-			let first = await crowdsale.firstInLine.call();
-			assert.equal(
-				first.valueOf(),
-				clients.user1,
-				"Solitary buyer should be first in line after enqueue",
-			);
-
 			await crowdsale.getInLine(clients.user2);
-			size = await crowdsale.lineSize.call();
-			assert.equal(
-				size.valueOf(),
-				2,
-				"Line size should be 2 once another person is enqueued."
-			);
 			let success = await crowdsale.sell.call({from: clients.user1, value: 9999});
 			assert.isFalse(success, "Sale should fail since sale cap is exceeded.");
 		});
@@ -188,7 +174,7 @@ contract('crowdsaleTest', function(accounts) {
 			await crowdsale.getInLine(clients.user2);
 			let successfulSale = await crowdsale.sell.call({from: clients.user1, value: 20});
 			assert(successfulSale, "Sale failed.");
-			let successfulRefund = await crowdsale.refund.call(20, {from: clients.user1})
+			let successfulRefund = await crowdsale.refund.call(10, {from: clients.user1})
 			assert(successfulRefund, "Refund failed.");
 			// tokensSold = await crowdsale.tokensSold.call();
 			// crowdSaleBalance = await crowdsale.crowdSaleBalance.call();
@@ -204,9 +190,15 @@ contract('crowdsaleTest', function(accounts) {
 			// );
 
 		});
+
 		it("Testing failed refund due to insufficient funds", async function() {
-			// TODO: implement
+			await crowdsale.getInLine(clients.user1);
+			await crowdsale.getInLine(clients.user2);
+			let successfulRefund = await crowdsale.refund.call(20, {from: clients.user1})
+			assert.isFalse(successfulRefund, "Refund should fail due to insufficient funds.");
+
 		});
+
 		it("Testing funds tranferred to owner at end of sale", async function() {
 			await crowdsale.getInLine(clients.user1);
 			await crowdsale.getInLine(clients.user2);
@@ -231,10 +223,10 @@ contract('crowdsaleTest', function(accounts) {
 		it("Testing receiveFunds fails for non-owner", async function() {
 			await crowdsale.getInLine(clients.user1);
 			await crowdsale.getInLine(clients.user2);
-			web3.currentProvider.send({jsonrpc: "2.0", method: "evm_increaseTime", params: [10000], id: 0});
+			web3.currentProvider.send({jsonrpc: "2.0", method: "evm_increaseTime", params: [100000], id: 0});
 			web3.currentProvider.send({jsonrpc: "2.0", method: "evm_mine", params: [], id: 0});
-			let success = await crowdsale.receiveFunds.call({from: clients.user1});
-			assert(success, "funds should not be transferred to non-owner at end of sale");
+			let success = await crowdsale.receiveFunds.call({from: clients.user2});
+			assert.isFalse(success, "funds should not be transferred to non-owner at end of sale");
 		});
 	});
 });
