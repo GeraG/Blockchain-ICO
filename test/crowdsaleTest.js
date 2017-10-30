@@ -101,7 +101,23 @@ contract('crowdsaleTest', function(accounts) {
 				"Solitary buyer should be first in line after enqueue",
 			);
 
-			let success = await crowdsale.sell.call({from: clients.user1, value: 20});
+			// seller can only sell if there is someone in line behind them.
+			await crowdsale.getInLine(clients.user2);
+			let size3 = await crowdsale.lineSize.call();
+			assert.equal(
+				size3.valueOf(),
+				2,
+				"Line size should be 2 once another person is enqueued."
+			);
+
+			first = await crowdsale.firstInLine.call();
+			assert.equal(
+				first.valueOf(),
+				clients.user1,
+				"The same buyer should be first in line, even after enqueue",
+			);
+
+			let success = await crowdsale.sell.call({from: clients.user1, value: 1});
 			assert(success.valueOf(), "simple sell failed");
 
 
