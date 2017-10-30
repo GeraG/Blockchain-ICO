@@ -102,21 +102,25 @@ contract('crowdsaleTest', function(accounts) {
 			);
 
 			let success = await crowdsale.sell.call({from: clients.user1, value: 20});
-			assert(success.valueOf(), "simple sell failed");
+			assert(!success.valueOf(), "Should not be able to sell until at least 2 ppl in line");
+
+			await crowdsale.getInLine(clients.user2);
+			let success2 = await crowdsale.sell.call({from: clients.user1, value: 20});
+			assert(success2.valueOf(), "First in line should be able to sell with 2 ppl in line");
 
 
-			tokensSold = await crowdsale.tokensSold.call();
-			crowdSaleBalance = await crowdsale.crowdSaleBalance.call();
-			assert.equal(
-				crowdSaleBalance.valueOf(),
-				20,
-				"crowdSaleBalance not updated after successful sale",
-			);
-			assert.equal(
-				tokensSold.valueOf(),
-				20 * args.exchangeRate,
-				"tokensSold not updated after successful sale",
-			);
+			// tokensSold = await crowdsale.tokensSold.call();
+			// crowdSaleBalance = await crowdsale.crowdSaleBalance.call();
+			// assert.equal(
+			// 	crowdSaleBalance.valueOf(),
+			// 	20,
+			// 	"crowdSaleBalance not updated after successful sale",
+			// );
+			// assert.equal(
+			// 	tokensSold.valueOf(),
+			// 	20 * args.exchangeRate,
+			// 	"tokensSold not updated after successful sale",
+			// );
 		});
 		it("Testing failed sell due to timeout", async function() {
 			// TODO: implement
