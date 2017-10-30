@@ -17,8 +17,8 @@ contract Crowdsale {
   uint public startTime;
   uint public endTime;
   uint256 public exchangeRate;
-  Token private token;
-  Queue private q;
+  Token public token;
+  Queue public q;
 
   event PurchaseCompleted(address buyer, bool successful);
   event RefundCompleted(address buyer, bool successful);
@@ -51,6 +51,35 @@ contract Crowdsale {
   }
 
 
+  function getQueue() returns (Queue) {
+    return q;
+  }
+
+
+  function firstInLine() constant returns(address) {
+    return q.getFirst();
+  }
+
+
+  function placeInLine() constant returns(uint8) {
+    return q.checkPlace();
+  }
+
+
+  function getInLine(address addr) {
+    q.enqueue(addr);
+  }
+
+  function lineSize() constant returns (uint8) {
+    return q.qsize();
+  }
+
+
+  function checkTime() {
+    q.checkTime();
+  }
+
+
   function weiToDragonGlass(uint256 amountInWei) returns (uint256) {
     return SafeMath.mul(amountInWei, exchangeRate);
   }
@@ -77,31 +106,16 @@ contract Crowdsale {
     if (tokensPurchased > (token.totalSupply() - tokensSold)) {
       return false;
     }
-
-    q.enqueue(msg.sender);
-    while (q.checkPlace() > 1) {  // wait until first in line
-      continue;
+    if (firstInLine() == msg.sender && lineSize() > 1) {
+      bool success = token.transfer(msg.sender, tokensPurchased);
+      if (success) {
+        crowdSaleBalance = SafeMath.add(crowdSaleBalance, msg.value);
+        tokensSold = SafeMath.add(tokensSold, tokensPurchased);
+      }
+      PurchaseCompleted(msg.sender, success);
+      return success;
     }
-    assert(q.checkPlace() > 0);  // should NEVER happen
-
-    q.checkTime();
-    if (q.checkPlace() == 0) {  // timeout. should already be dequeued now
-      assert(msg.sender.send(msg.value));  // refund ether (should always pass!)
-      PurchaseCompleted(msg.sender, false);
-      return false;
-    }
-
-    while (q.qsize() < 1) {  // wait until at least 2 nodes in the queue
-      continue;
-    }
-    q.dequeue();
-    bool success = token.transfer(msg.sender, tokensPurchased);
-    if (success) {
-      crowdSaleBalance = SafeMath.add(crowdSaleBalance, msg.value);
-      tokensSold = SafeMath.add(tokensSold, tokensPurchased);
-    }
-    PurchaseCompleted(msg.sender, success);
-    return success;
+    return false;
   }
 
 

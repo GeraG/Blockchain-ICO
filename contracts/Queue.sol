@@ -10,7 +10,7 @@ pragma solidity ^0.4.15;
 contract Queue {
 	/* State variables */
 	uint8 size = 5;
-	uint timeLimit = 60;
+	uint timeLimit = 10;
 	uint8 numPeople;
 	address[] people;
 	uint[] times;
