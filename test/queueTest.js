@@ -95,6 +95,9 @@ contract('queueTest', function(accounts) {
 		it("Expel the person in the front of the queue.", async function() {
 			await queue.enqueue(accounts[0]);
 			await queue.enqueue(accounts[1]);
+			web3.currentProvider.send({jsonrpc: "2.0", method: "evm_increaseTime", params: [10000], id: 0});
+			web3.currentProvider.send({jsonrpc: "2.0", method: "evm_mine", params: [], id: 0});
+
 			var queueSize = await queue.qsize();
 			while (queueSize > 1) {
 				await queue.checkTime();

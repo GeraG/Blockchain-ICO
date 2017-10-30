@@ -44,11 +44,24 @@ contract('crowdsaleTest', function(accounts) {
 	});
 
 	describe('Timing Tests', function() {
-		it("Testing sale ends after timeCap", async function() {
-			// TODO: implement
+		it("Testing refund fails after sale ends", async function() {
+			await crowdsale.getInLine(clients.user1);
+			await crowdsale.getInLine(clients.user2);
+			var success = await crowdsale.sell.call({from: clients.user1, value: 20});
+			assert(success.valueOf(), "simple sell failed");
+			web3.currentProvider.send({jsonrpc: "2.0", method: "evm_increaseTime", params: [10000], id: 0});
+			web3.currentProvider.send({jsonrpc: "2.0", method: "evm_mine", params: [], id: 0});
+			let successfulRefund = await crowdsale.refund.call(20, {from: clients.user1})
+			assert.isFalse(successfulRefund.valueOf(), "refund should not succeed after timeout");
+
 		});
-		it("Testing sell and refund fail after sale ends", async function() {
-			// TODO: implement
+
+		it("Testing sell fails after sale ends", async function() {
+			await crowdsale.getInLine(clients.user1);
+			await crowdsale.getInLine(clients.user2);
+			web3.currentProvider.send({jsonrpc: "2.0", method: "evm_increaseTime", params: [10000], id: 0});
+			web3.currentProvider.send({jsonrpc: "2.0", method: "evm_mine", params: [], id: 0});			let success = await crowdsale.sell.call({from: clients.user1, value: 20});
+			assert.isFalse(success.valueOf(), "simple sell should not succeed after timeout");
 		});
 	});
 
@@ -136,9 +149,9 @@ contract('crowdsaleTest', function(accounts) {
 			// 	"tokensSold not updated after successful sale",
 			// );
 		});
-		it("Testing failed sell due to timeout", async function() {
-			// TODO: implement
-		});
+
+
+
 		it("Testing failed sell due to insufficient funds", async function() {
 			// TODO: implement
 		});
@@ -170,22 +183,58 @@ contract('crowdsaleTest', function(accounts) {
 		});
 
 		it("Testing successful refunds", async function() {
-			// TODO: implement
+
+			await crowdsale.getInLine(clients.user1);
+			await crowdsale.getInLine(clients.user2);
+			let successfulSale = await crowdsale.sell.call({from: clients.user1, value: 20});
+			assert(successfulSale, "Sale failed.");
+			let successfulRefund = await crowdsale.refund.call(20, {from: clients.user1})
+			assert(successfulRefund, "Refund failed.");
+			// tokensSold = await crowdsale.tokensSold.call();
+			// crowdSaleBalance = await crowdsale.crowdSaleBalance.call();
+			// assert.equal(
+			// 	crowdSaleBalance.valueOf(),
+			// 	0,
+			// 	"crowdSaleBalance not updated after successful sale",
+			// );
+			// assert.equal(
+			// 	tokensSold.valueOf(),
+			// 	0,
+			// 	"tokensSold not updated after successful sale",
+			// );
+
 		});
 		it("Testing failed refund due to insufficient funds", async function() {
 			// TODO: implement
 		});
 		it("Testing funds tranferred to owner at end of sale", async function() {
-			// TODO: implement
+			await crowdsale.getInLine(clients.user1);
+			await crowdsale.getInLine(clients.user2);
+			web3.currentProvider.send({jsonrpc: "2.0", method: "evm_increaseTime", params: [10000], id: 0});
+			web3.currentProvider.send({jsonrpc: "2.0", method: "evm_mine", params: [], id: 0});
+			let success = await crowdsale.receiveFunds.call({from: clients._owner});
+			assert(success, "funds were not transferred to owner at end of sale");
 		});
 	});
 
 	describe('Security and Permission Tests', function() {
 		it("Testing minting and burning fails for non-owner", async function() {
-			// TODO: implement
+			await crowdsale.mint(999, {from: clients.user1});
+			var ts = await token.totalSupply.call();
+			assert.equal(ts.valueOf(), args.totalSupply, "Non-owner should not be able to mint new tokens.");
+
+			await crowdsale.burn(999, {from: clients.user1});
+			ts = await token.totalSupply.call();
+			assert.equal(ts.valueOf(), args.totalSupply, "Non-owner should not be able to burn tokens.");
+		
 		});
 		it("Testing receiveFunds fails for non-owner", async function() {
-			// TODO: implement
+			await crowdsale.getInLine(clients.user1);
+			await crowdsale.getInLine(clients.user2);
+			web3.currentProvider.send({jsonrpc: "2.0", method: "evm_increaseTime", params: [10000], id: 0});
+			web3.currentProvider.send({jsonrpc: "2.0", method: "evm_mine", params: [], id: 0});
+			let success = await crowdsale.receiveFunds.call({from: clients.user1});
+			assert(success, "funds should not be transferred to non-owner at end of sale");
 		});
 	});
 });

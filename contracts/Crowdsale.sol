@@ -30,12 +30,12 @@ contract Crowdsale {
 
 
   modifier SaleHasEnded() {
-		if (now > startTime) {_;}
+		if (now > endTime) {_;}
 	}
 
 
   modifier SaleHasNotEnded() {
-		if (now <= startTime) {_;}
+		if (now <= endTime) {_;}
 	}
 
 
