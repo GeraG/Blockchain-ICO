@@ -142,9 +142,33 @@ contract('crowdsaleTest', function(accounts) {
 		it("Testing failed sell due to insufficient funds", async function() {
 			// TODO: implement
 		});
+
 		it("Testing failed sell due to sale cap exceeded", async function() {
-			// TODO: implement
+			await crowdsale.getInLine(clients.user1);
+			var size = await crowdsale.lineSize.call();
+			assert.equal(
+				size.valueOf(),
+				1,
+				"Line size should be 1 for single seller before purchase completes",
+			);
+			let first = await crowdsale.firstInLine.call();
+			assert.equal(
+				first.valueOf(),
+				clients.user1,
+				"Solitary buyer should be first in line after enqueue",
+			);
+
+			await crowdsale.getInLine(clients.user2);
+			size = await crowdsale.lineSize.call();
+			assert.equal(
+				size.valueOf(),
+				2,
+				"Line size should be 2 once another person is enqueued."
+			);
+			let success = await crowdsale.sell.call({from: clients.user1, value: 9999});
+			assert.isFalse(success, "Sale should fail since sale cap is exceeded.");
 		});
+
 		it("Testing successful refunds", async function() {
 			// TODO: implement
 		});
