@@ -5,7 +5,7 @@ const Crowdsale = artifacts.require("./Crowdsale.sol");
 
 contract('crowdsaleTest', function(accounts) {
 	const args = {exchangeRate: 5, totalSupply: 1000, timeCap: 5000};
-	const clients = {_owner: accounts[1], user1: accounts[2], user2: accounts[3]};
+	const clients = {_owner: accounts[0], user1: accounts[1], user2: accounts[2]};
 	let crowdsale;
 
 	/* Do something before every `describe` method */
@@ -65,7 +65,7 @@ contract('crowdsaleTest', function(accounts) {
 			assert.equal(tokensSold.valueOf(), 0, "Tokens sold should be 0 before any sale");
 			assert.equal(crowdSaleBalance.valueOf(), 0, "Crowdsale balance should be 0 before any sale");
 
-			let size = await crowdsale.lineSize.call();
+			var size = await crowdsale.lineSize.call();
 			assert.equal(size, 0, "Line size should be 0 at beginning of sale");
 			await crowdsale.getInLine.call(clients.user1);
 			size = await crowdsale.lineSize.call();
@@ -80,9 +80,9 @@ contract('crowdsaleTest', function(accounts) {
 			// tokensSold = await crowdsale.tokensSold.call();
 			// crowdSaleBalance = await crowdsale.crowdSaleBalance.call();
 			// assert.equal(
-			// 	crowdSaleBalance,
-			// 	20,
-			// 	"crowdSaleBalance not updated after successful sale",
+				// crowdSaleBalance,
+				// 20,
+				// "crowdSaleBalance not updated after successful sale",
 			// );
 			// assert.equal(
 			// 	tokensSold,
