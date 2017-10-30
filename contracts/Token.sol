@@ -102,6 +102,7 @@ contract Token is ERC20Interface {
         }
 
         // approval not found
+        Transfer(_from, _to, 0);
         return false;
     }
 
