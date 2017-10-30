@@ -174,8 +174,10 @@ contract('crowdsaleTest', function(accounts) {
 			await crowdsale.getInLine(clients.user2);
 			let successfulSale = await crowdsale.sell.call({from: clients.user1, value: 20});
 			assert(successfulSale, "Sale failed.");
-			let successfulRefund = await crowdsale.refund.call(10, {from: clients.user1})
-			assert(successfulRefund, "Refund failed.");
+			let successfulRefund = await crowdsale.refund.call(20, {from: clients.user1})
+			// assert(successfulRefund, "Refund failed.");
+			let b = await token.balanceOf.call(clients.user1);
+			assert(b.valueOf(), 0, "User should have 0 balance after full refund.");
 			// tokensSold = await crowdsale.tokensSold.call();
 			// crowdSaleBalance = await crowdsale.crowdSaleBalance.call();
 			// assert.equal(
@@ -196,7 +198,6 @@ contract('crowdsaleTest', function(accounts) {
 			await crowdsale.getInLine(clients.user2);
 			let successfulRefund = await crowdsale.refund.call(20, {from: clients.user1})
 			assert.isFalse(successfulRefund, "Refund should fail due to insufficient funds.");
-
 		});
 
 		it("Testing funds tranferred to owner at end of sale", async function() {
